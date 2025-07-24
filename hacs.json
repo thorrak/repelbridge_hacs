@@ -1,0 +1,9 @@
+{
+  "name": "RepelBridge",
+  "content_in_root": false,
+  "filename": "repelbridge.zip",
+  "render_readme": true,
+  "domains": ["light", "sensor", "switch", "number"],
+  "iot_class": "Local Polling",
+  "homeassistant": "2023.1.0"
+}
