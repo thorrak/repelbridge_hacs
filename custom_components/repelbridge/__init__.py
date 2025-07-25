@@ -104,8 +104,9 @@ class RepelBridgeAPI:
     async def set_auto_shutoff(self, bus_id: int, minutes: int) -> dict:
         """Set auto shutoff setting."""
         url = f"{self.base_url}/api/bus/{bus_id}/auto_shutoff"
-        data = {"minutes": str(minutes)}
-        async with self.session.post(url, data=data) as response:
+        json_data = {"minutes": minutes}
+        headers = {"Content-Type": "application/json"}
+        async with self.session.post(url, json=json_data, headers=headers) as response:
             response.raise_for_status()
             return await response.json()
 
@@ -119,8 +120,9 @@ class RepelBridgeAPI:
     async def set_warn_at(self, bus_id: int, hours: int) -> dict:
         """Set cartridge warning threshold."""
         url = f"{self.base_url}/api/bus/{bus_id}/warn_at"
-        data = {"hours": hours}
-        async with self.session.post(url, data=data) as response:
+        json_data = {"hours": hours}
+        headers = {"Content-Type": "application/json"}
+        async with self.session.post(url, json=json_data, headers=headers) as response:
             response.raise_for_status()
             return await response.json()
 
