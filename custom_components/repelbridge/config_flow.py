@@ -130,6 +130,9 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         return self.async_show_form(
             step_id="zeroconf_confirm",
             description_placeholders=placeholders,
+            data_schema=vol.Schema({}),
+            last_step=True,
+            errors={},
         )
 
 

@@ -11,7 +11,7 @@
       },
       "zeroconf_confirm": {
         "title": "Add RepelBridge Device",
-        "description": "Do you want to add the RepelBridge device **{name}** to Home Assistant?\n\nThis will allow you to control Liv Repeller devices and monitor cartridge life through Home Assistant."
+        "description": "Do you want to add the RepelBridge device {name} to Home Assistant? This will allow you to control Liv Repeller devices and monitor cartridge life."
       }
     },
     "error": {
