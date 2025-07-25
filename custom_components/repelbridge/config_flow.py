@@ -101,7 +101,12 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         except (CannotConnect, InvalidHost):
             return self.async_abort(reason="cannot_connect")
         
-        self.context.update({"title_placeholders": {"name": name}})
+        # Store the host and name for the confirmation step
+        self.context.update({
+            "title_placeholders": {"name": name},
+            "discovered_host": host,
+            "discovered_name": name
+        })
         
         return await self.async_step_zeroconf_confirm()
 
@@ -110,17 +115,21 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     ) -> FlowResult:
         """Handle a confirmation flow initiated by zeroconf."""
         if user_input is not None:
-            host = self.context["unique_id"]
-            name = self.context["title_placeholders"]["name"]
+            host = self.context.get("discovered_host") or self.context["unique_id"]
+            name = self.context.get("discovered_name") or self.context["title_placeholders"]["name"]
             
             return self.async_create_entry(
                 title=name,
                 data={CONF_HOST: host, CONF_NAME: name},
             )
 
+        # Ensure we have a name to display
+        name = self.context.get("discovered_name", "RepelBridge")
+        placeholders = {"name": name}
+
         return self.async_show_form(
             step_id="zeroconf_confirm",
-            description_placeholders=self.context["title_placeholders"],
+            description_placeholders=placeholders,
         )
 
 
