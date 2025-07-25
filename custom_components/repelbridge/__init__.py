@@ -28,6 +28,7 @@ PLATFORMS: list[Platform] = [
     Platform.SENSOR,
     Platform.SWITCH,
     Platform.NUMBER,
+    Platform.BUTTON,
 ]
 
 
@@ -99,10 +100,10 @@ class RepelBridgeAPI:
             response.raise_for_status()
             return await response.json()
 
-    async def set_auto_shutoff(self, bus_id: int, seconds: int) -> dict:
+    async def set_auto_shutoff(self, bus_id: int, minutes: int) -> dict:
         """Set auto shutoff setting."""
         url = f"{self.base_url}/api/bus/{bus_id}/auto_shutoff"
-        data = {"seconds": seconds}
+        data = {"minutes": minutes}
         async with self.session.post(url, data=data) as response:
             response.raise_for_status()
             return await response.json()

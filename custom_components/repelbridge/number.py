@@ -85,9 +85,9 @@ class RepelBridgeAutoShutoffNumber(RepelBridgeNumberBase):
         self._attr_unique_id = f"repelbridge_bus_{bus_id}_auto_shutoff"
         self._attr_name = f"Liv Repeller Bus {bus_id} Auto Shutoff"
         self._attr_native_min_value = 0
-        self._attr_native_max_value = 57600  # 16 hours in seconds
-        self._attr_native_step = 60  # 1 minute steps
-        self._attr_native_unit_of_measurement = UnitOfTime.SECONDS
+        self._attr_native_max_value = 960  # 16 hours in minutes
+        self._attr_native_step = 1  # 1 minute steps
+        self._attr_native_unit_of_measurement = UnitOfTime.MINUTES
         self._attr_mode = NumberMode.BOX
 
     @property
@@ -97,7 +97,7 @@ class RepelBridgeAutoShutoffNumber(RepelBridgeNumberBase):
             return None
         
         auto_shutoff_data = self.coordinator.data["buses"][self.bus_id]["auto_shutoff"]
-        return auto_shutoff_data.get("auto_shutoff_seconds", 0)
+        return auto_shutoff_data.get("auto_shutoff_minutes", 0)
 
     async def async_set_native_value(self, value: float) -> None:
         """Set the auto shutoff value."""
@@ -114,7 +114,7 @@ class RepelBridgeAutoShutoffNumber(RepelBridgeNumberBase):
         
         return {
             "bus_id": self.bus_id,
-            "description": "Automatic shutoff time in seconds (0 = disabled)",
+            "description": "Automatic shutoff time in minutes (0 = disabled)",
             "max_hours": 16,
         }
 

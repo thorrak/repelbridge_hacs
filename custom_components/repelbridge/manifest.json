@@ -9,5 +9,6 @@
   "issue_tracker": "https://github.com/jbeeler/repelbridge-hacs/issues",
   "requirements": ["aiohttp>=3.8.0"],
   "version": "1.0.0",
-  "zeroconf": ["_repelbridge._tcp.local."]
+  "zeroconf": ["_repelbridge._tcp.local."],
+  "icon": "icon"
 }
