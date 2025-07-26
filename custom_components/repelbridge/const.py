@@ -10,7 +10,8 @@ DEFAULT_BUS_COUNT = 2
 DEFAULT_SCAN_INTERVAL = 30
 
 # Entity types
-ENTITY_TYPES = ["light", "sensor", "switch", "number"]
+# ENTITY_TYPES = ["light", "sensor", "switch", "number"]
+ENTITY_TYPES = ["light", "sensor", "number"]
 
 # Service names
 SERVICE_RESET_CARTRIDGE = "reset_cartridge"
