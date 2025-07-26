@@ -55,7 +55,7 @@ class RepelBridgeLight(CoordinatorEntity, LightEntity):
         self._attr_unique_id = f"{entry_id}_bus_{bus_id}_light"
         # Include entry_id prefix in name to make entity_id unique
         entry_short = entry_id.split('-')[0]  # Use first part of entry_id
-        self._attr_name = f"RepelBridge {entry_short} Bus {bus_id}"
+        self._attr_name = f"Bus {bus_id} Repellers"
         self._attr_color_mode = ColorMode.RGB
         self._attr_supported_color_modes = {ColorMode.RGB}
 
