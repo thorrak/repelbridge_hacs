@@ -84,7 +84,8 @@ class RepelBridgeRuntimeSensor(RepelBridgeSensorBase):
         """Initialize the sensor."""
         super().__init__(coordinator, bus_id, entry_id)
         self._attr_unique_id = f"{entry_id}_bus_{bus_id}_runtime_hours"
-        self._attr_name = f"Liv Repeller Bus {bus_id} Runtime Hours"
+        entry_short = entry_id.split('-')[0]
+        self._attr_name = f"RepelBridge {entry_short} Bus {bus_id} Runtime Hours"
         self._attr_device_class = SensorDeviceClass.DURATION
         self._attr_state_class = SensorStateClass.TOTAL_INCREASING
         self._attr_native_unit_of_measurement = UnitOfTime.HOURS
@@ -118,7 +119,8 @@ class RepelBridgeCartridgeLifeSensor(RepelBridgeSensorBase):
         """Initialize the sensor."""
         super().__init__(coordinator, bus_id, entry_id)
         self._attr_unique_id = f"{entry_id}_bus_{bus_id}_cartridge_life"
-        self._attr_name = f"Liv Repeller Bus {bus_id} Cartridge Life"
+        entry_short = entry_id.split('-')[0]
+        self._attr_name = f"RepelBridge {entry_short} Bus {bus_id} Cartridge Life"
         self._attr_state_class = SensorStateClass.MEASUREMENT
         self._attr_native_unit_of_measurement = PERCENTAGE
 
@@ -154,7 +156,8 @@ class RepelBridgeRepellerCountSensor(RepelBridgeSensorBase):
         """Initialize the sensor."""
         super().__init__(coordinator, bus_id, entry_id)
         self._attr_unique_id = f"{entry_id}_bus_{bus_id}_repeller_count"
-        self._attr_name = f"Liv Repeller Bus {bus_id} Device Count"
+        entry_short = entry_id.split('-')[0]
+        self._attr_name = f"RepelBridge {entry_short} Bus {bus_id} Device Count"
         self._attr_state_class = SensorStateClass.MEASUREMENT
 
     @property

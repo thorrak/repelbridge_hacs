@@ -86,7 +86,8 @@ class RepelBridgeAutoShutoffNumber(RepelBridgeNumberBase):
         """Initialize the auto shutoff number entity."""
         super().__init__(coordinator, api, bus_id, entry_id)
         self._attr_unique_id = f"{entry_id}_bus_{bus_id}_auto_shutoff"
-        self._attr_name = f"Liv Repeller Bus {bus_id} Auto Shutoff"
+        entry_short = entry_id.split('-')[0]
+        self._attr_name = f"RepelBridge {entry_short} Bus {bus_id} Auto Shutoff"
         self._attr_native_min_value = 0
         self._attr_native_max_value = 960  # 16 hours in minutes
         self._attr_native_step = 1  # 1 minute steps
@@ -135,7 +136,8 @@ class RepelBridgeCartridgeWarnAtNumber(RepelBridgeNumberBase):
         """Initialize the cartridge warning number entity."""
         super().__init__(coordinator, api, bus_id, entry_id)
         self._attr_unique_id = f"{entry_id}_bus_{bus_id}_cartridge_warn_at"
-        self._attr_name = f"Liv Repeller Bus {bus_id} Cartridge Warning"
+        entry_short = entry_id.split('-')[0]
+        self._attr_name = f"RepelBridge {entry_short} Bus {bus_id} Cartridge Warning"
         self._attr_native_min_value = 1
         self._attr_native_max_value = 1000  # 1000 hours max
         self._attr_native_step = 1

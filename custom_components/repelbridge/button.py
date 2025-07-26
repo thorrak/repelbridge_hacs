@@ -48,7 +48,8 @@ class RepelBridgeResetCartridgeButton(CoordinatorEntity, ButtonEntity):
         self.api = api
         self.bus_id = bus_id
         self._attr_unique_id = f"{entry_id}_bus_{bus_id}_reset_cartridge"
-        self._attr_name = f"Liv Repeller Bus {bus_id} Reset Cartridge"
+        entry_short = entry_id.split('-')[0]
+        self._attr_name = f"RepelBridge {entry_short} Bus {bus_id} Reset Cartridge"
         self._attr_icon = "mdi:restore"
 
     @property
