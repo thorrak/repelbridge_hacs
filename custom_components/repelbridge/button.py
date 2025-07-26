@@ -1,4 +1,4 @@
-"""Button platform for Liv Repeller integration."""
+"""Button platform for repeller integration."""
 from __future__ import annotations
 
 import logging

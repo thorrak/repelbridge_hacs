@@ -1,4 +1,4 @@
-"""Light platform for Liv Repeller integration."""
+"""Light platform for repeller integration."""
 from __future__ import annotations
 
 import logging
@@ -26,7 +26,7 @@ async def async_setup_entry(
     config_entry: ConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
-    """Set up Liv Repeller light platform."""
+    """Set up repeller light platform."""
     coordinator: RepelBridgeDataUpdateCoordinator = hass.data[DOMAIN][config_entry.entry_id]["coordinator"]
     api: RepelBridgeAPI = hass.data[DOMAIN][config_entry.entry_id]["api"]
     
@@ -39,7 +39,7 @@ async def async_setup_entry(
 
 
 class RepelBridgeLight(CoordinatorEntity, LightEntity):
-    """Representation of a Liv Repeller light."""
+    """Representation of a repeller light."""
 
     def __init__(
         self,

@@ -1,4 +1,4 @@
-"""Number platform for Liv Repeller integration."""
+"""Number platform for repeller integration."""
 from __future__ import annotations
 
 import logging
@@ -22,7 +22,7 @@ async def async_setup_entry(
     config_entry: ConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
-    """Set up Liv Repeller number platform."""
+    """Set up repeller number platform."""
     coordinator: RepelBridgeDataUpdateCoordinator = hass.data[DOMAIN][config_entry.entry_id]["coordinator"]
     api: RepelBridgeAPI = hass.data[DOMAIN][config_entry.entry_id]["api"]
     
@@ -38,7 +38,7 @@ async def async_setup_entry(
 
 
 class RepelBridgeNumberBase(CoordinatorEntity, NumberEntity):
-    """Base class for Liv Repeller number entities."""
+    """Base class for repeller number entities."""
 
     def __init__(
         self,

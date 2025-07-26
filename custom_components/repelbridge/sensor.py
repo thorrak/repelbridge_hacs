@@ -1,4 +1,4 @@
-"""Sensor platform for Liv Repeller integration."""
+"""Sensor platform for repeller integration."""
 from __future__ import annotations
 
 import logging
@@ -26,7 +26,7 @@ async def async_setup_entry(
     config_entry: ConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
-    """Set up Liv Repeller sensor platform."""
+    """Set up repeller sensor platform."""
     coordinator: RepelBridgeDataUpdateCoordinator = hass.data[DOMAIN][config_entry.entry_id]["coordinator"]
     
     # Create sensor entities for both buses
@@ -44,7 +44,7 @@ async def async_setup_entry(
 
 
 class RepelBridgeSensorBase(CoordinatorEntity, SensorEntity):
-    """Base class for Liv Repeller sensors."""
+    """Base class for repeller sensors."""
 
     def __init__(
         self,

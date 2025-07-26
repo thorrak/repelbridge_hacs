@@ -1,4 +1,4 @@
-"""Switch platform for Liv Repeller integration."""
+"""Switch platform for repeller integration."""
 from __future__ import annotations
 
 import logging
@@ -15,6 +15,6 @@ async def async_setup_entry(
     config_entry: ConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
-    """Set up Liv Repeller switch platform."""
+    """Set up repeller switch platform."""
     # No switch entities - power control is handled by light entities only
     async_add_entities([])
