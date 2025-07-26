@@ -59,6 +59,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Handle a config flow for RepelBridge."""
 
     VERSION = 1
+    CONNECTION_CLASS = config_entries.CONN_CLASS_LOCAL_POLL
 
     async def async_step_user(
         self, user_input: dict[str, Any] | None = None
@@ -77,8 +78,17 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 errors["base"] = "unknown"
             else:
                 # Check if already configured
-                await self.async_set_unique_id(user_input[CONF_HOST])
-                self._abort_if_unique_id_configured(updates={CONF_HOST: user_input[CONF_HOST]})
+                unique_id = user_input[CONF_HOST]
+                _LOGGER.debug("Setting unique_id to: %s", unique_id)
+                await self.async_set_unique_id(unique_id)
+                
+                try:
+                    self._abort_if_unique_id_configured(
+                        updates={CONF_HOST: user_input[CONF_HOST], CONF_NAME: user_input[CONF_NAME]}
+                    )
+                except Exception as e:
+                    _LOGGER.error("Error checking unique_id: %s", e)
+                    raise
                 
                 return self.async_create_entry(title=info["title"], data=user_input)
 
@@ -93,7 +103,9 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         
         # Check if already configured
         await self.async_set_unique_id(host)
-        self._abort_if_unique_id_configured(updates={CONF_HOST: host})
+        self._abort_if_unique_id_configured(
+            updates={CONF_HOST: host, CONF_NAME: name}
+        )
         
         # Try to validate the discovered device
         try:
