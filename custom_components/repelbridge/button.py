@@ -21,7 +21,7 @@ async def async_setup_entry(
     config_entry: ConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
-    """Set up Liv Repeller button platform."""
+    """Set up repeller button platform."""
     coordinator: RepelBridgeDataUpdateCoordinator = hass.data[DOMAIN][config_entry.entry_id]["coordinator"]
     api: RepelBridgeAPI = hass.data[DOMAIN][config_entry.entry_id]["api"]
     
@@ -55,11 +55,12 @@ class RepelBridgeResetCartridgeButton(CoordinatorEntity, ButtonEntity):
     @property
     def device_info(self) -> dict[str, Any]:
         """Return device information."""
+        entry_short = self.coordinator.config_entry.entry_id.split('-')[0]
         return {
-            "identifiers": {(DOMAIN, f"bus_{self.bus_id}")},
-            "name": f"Bus {self.bus_id}",
-            "manufacturer": "Liv",
-            "model": "RepelBridge Controller",
+            "identifiers": {(DOMAIN, f"{self.coordinator.config_entry.entry_id}_bus_{self.bus_id}")},
+            "name": f"RepelBridge {entry_short} Bus {self.bus_id}",
+            "manufacturer": "RepelBridge",
+            "model": "Repeller Controller",
             "sw_version": "1.0.0",
         }
 

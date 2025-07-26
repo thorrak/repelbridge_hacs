@@ -58,11 +58,12 @@ class RepelBridgeCartridgeLowSensor(CoordinatorEntity, BinarySensorEntity):
     @property
     def device_info(self) -> dict[str, Any]:
         """Return device information."""
+        entry_short = self.coordinator.config_entry.entry_id.split('-')[0]
         return {
-            "identifiers": {(DOMAIN, f"bus_{self.bus_id}")},
-            "name": f"Bus {self.bus_id}",
-            "manufacturer": "Liv",
-            "model": "RepelBridge Controller",
+            "identifiers": {(DOMAIN, f"{self.coordinator.config_entry.entry_id}_bus_{self.bus_id}")},
+            "name": f"RepelBridge {entry_short} Bus {self.bus_id}",
+            "manufacturer": "RepelBridge",
+            "model": "Repeller Controller",
             "sw_version": "1.0.0",
         }
 

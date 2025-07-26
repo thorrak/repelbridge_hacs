@@ -60,11 +60,12 @@ class RepelBridgeSensorBase(CoordinatorEntity, SensorEntity):
     @property
     def device_info(self) -> dict[str, Any]:
         """Return device information."""
+        entry_short = self.entry_id.split('-')[0]
         return {
-            "identifiers": {(DOMAIN, f"bus_{self.bus_id}")},
-            "name": f"Bus {self.bus_id}",
-            "manufacturer": "Liv",
-            "model": "RepelBridge Controller",
+            "identifiers": {(DOMAIN, f"{self.entry_id}_bus_{self.bus_id}")},
+            "name": f"RepelBridge {entry_short} Bus {self.bus_id}",
+            "manufacturer": "RepelBridge",
+            "model": "Repeller Controller",
             "sw_version": "1.0.0",
         }
 
