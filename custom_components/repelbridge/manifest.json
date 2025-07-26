@@ -1,14 +1,13 @@
 {
   "domain": "repelbridge",
   "name": "RepelBridge",
+  "version": "1.0.1",
+  "integration_type": "device",
+  "documentation": "https://github.com/thorrak/repelbridge_hacs",
+  "issue_tracker": "https://github.com/thorrak/repelbridge_hacs/issues",
   "codeowners": ["@thorrak"],
   "config_flow": true,
-  "documentation": "https://github.com/thorrak/repelbridge_hacs",
-  "homeassistant": "2023.1.0",
   "iot_class": "local_polling",
-  "issue_tracker": "https://github.com/thorrak/repelbridge_hacs/issues",
-  "requirements": ["aiohttp>=3.8.0"],
-  "version": "1.0.1",
-  "zeroconf": ["_repelbridge._tcp.local."],
-  "icon": "icon"
+  "homeassistant": "2023.1.0",
+  "zeroconf": ["_repelbridge._tcp.local."]
 }
