@@ -2,40 +2,55 @@
 
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/custom-components/hacs)
 
-A Home Assistant integration for Liv Repeller devices via WiFi control through RepelBridge.
+A Home Assistant integration for Liv Repeller pest control devices via WiFi-enabled RepelBridge controllers. This integration enables smart home automation and monitoring of dual-bus RS-485 repeller systems.
 
 ## Features
 
-This integration provides comprehensive control and monitoring of Liv Repeller devices through Home Assistant:
-
 ### Device Control
-- **Light Entity**: RGB color control and brightness adjustment (0-255 HA scale)
-- **Switch Entity**: Simple power on/off control
-- **Number Entities**: Configure auto-shutoff and cartridge warning thresholds
+- **RGB Light Control**: Full RGB color selection and brightness adjustment (0-255 HA scale)
+- **Power Management**: Simple on/off control per bus with warm-up sequences
+- **Dual Bus Support**: Independent control of Bus 0 and Bus 1 with separate repeller networks
+- **Auto-Shutoff Configuration**: Set automatic power-off timers (0-16 hours)
+- **Cartridge Warning Thresholds**: Configure low-cartridge alerts
 
-### Monitoring
-- **Runtime Tracking**: Monitor cartridge usage in hours
-- **Cartridge Life**: Track remaining cartridge life as percentage
-- **Device Count**: Number of connected repellers per bus
-- **System Status**: WiFi connection, uptime, and device information
+### Monitoring & Diagnostics
+- **Real-time Cartridge Tracking**: Monitor runtime hours and remaining life percentage
+- **Device Count Monitoring**: Track connected repellers per bus
+- **System Health**: WiFi status, uptime, and device information
+- **Bus State Monitoring**: Online/offline status for each bus
 
-### Services
-- **Reset Cartridge**: Reset runtime counter to zero via service call
+### Smart Home Integration
+- **Automatic Discovery**: Zero-configuration setup via mDNS (Zeroconf)
+- **Service Actions**: Reset cartridge counters, power cycling
+- **Entity Status**: Binary sensors for operational states
+- **Configuration Entities**: Number inputs for thresholds and timers
 
 ## Installation
 
 ### HACS (Recommended)
 
-1. Add this repository to HACS as a custom repository
-2. Install "RepelBridge" from the HACS integration page
-3. Restart Home Assistant
-4. Add the integration through the UI
+1. **Add Custom Repository**:
+   - Open HACS in Home Assistant
+   - Go to **Integrations** → **⋮** → **Custom repositories**
+   - Add repository URL: `https://github.com/thorrak/repelbridge_hacs`
+   - Select category: **Integration**
+
+2. **Install Integration**:
+   - Search for "RepelBridge" in HACS
+   - Click **Download**
+   - Restart Home Assistant
+
+3. **Configure Device**:
+   - Go to **Settings** → **Devices & Services**
+   - Click **Add Integration** and search for "RepelBridge"
+   - Enter device IP or use automatic discovery
 
 ### Manual Installation
 
-1. Copy the `repelbridge` folder to your `custom_components` directory
-2. Restart Home Assistant
-3. Add the integration through the UI
+1. Download the latest release from GitHub
+2. Extract `custom_components/repelbridge/` to your Home Assistant config directory
+3. Restart Home Assistant
+4. Add the integration through **Settings** → **Devices & Services**
 
 ## Configuration
 
@@ -71,8 +86,16 @@ For each bus (0 and 1), the following entities are created:
 - `sensor.repelbridge_uptime` - System uptime
 
 ### Number Entities
-- `number.repelbridge_bus_0_auto_shutoff` - Auto shutoff time (seconds)
+- `number.repelbridge_bus_0_auto_shutoff` - Auto shutoff time (minutes)
 - `number.repelbridge_bus_0_cartridge_warning` - Warning threshold (hours)
+
+### Button Entities
+- `button.repelbridge_bus_0_reset_cartridge` - Reset cartridge runtime counter
+- `button.repelbridge_bus_1_reset_cartridge` - Reset cartridge runtime counter
+
+### Binary Sensor Entities
+- `binary_sensor.repelbridge_bus_0_status` - Bus operational status
+- `binary_sensor.repelbridge_bus_1_status` - Bus operational status
 
 ## Services
 
@@ -82,6 +105,8 @@ Reset the cartridge runtime counter to zero:
 
 ```yaml
 service: repelbridge.reset_cartridge
+target:
+  entity_id: light.repelbridge_bus_0
 data:
   bus_id: 0  # or 1
 ```
@@ -141,27 +166,51 @@ The integration uses the device's REST API. Direct API access is available at:
 - `GET /api/bus/{0,1}/cartridge` - Cartridge monitoring
 - `POST /api/bus/{0,1}/cartridge/reset` - Reset cartridge tracking
 
+## Device Requirements
+
+### Hardware Setup
+- **RepelBridge ESP32-C6 Controller** configured in WiFi mode
+- **Dual RS-485 Bus Support** for independent repeller networks  
+- **WiFi Network Connection** on same network as Home Assistant
+
+### Firmware Configuration
+Ensure RepelBridge device is running in `MODE_WIFI_CONTROLLER` mode with:
+- Web server enabled on port 80
+- mDNS service broadcasting `_repelbridge._tcp.local.`
+- REST API endpoints active
+
 ## Troubleshooting
 
 ### Device Not Discovered
-- Ensure device is on the same network
-- Check device is in WiFi mode (`MODE_WIFI_CONTROLLER`)
-- Verify mDNS service `_repelbridge._tcp.local.` is broadcast
+- Ensure device is on the same network as Home Assistant
+- Verify device is in WiFi mode (`MODE_WIFI_CONTROLLER`)
+- Check mDNS service `_repelbridge._tcp.local.` is broadcasting
+- Try manual IP configuration if auto-discovery fails
 
 ### Connection Issues
-- Verify IP address is correct
-- Check device web interface is accessible at `http://device-ip/api/system/status`
+- Verify IP address is correct and device is online
+- Test device web interface: `http://device-ip/api/system/status`
 - Ensure firewall allows HTTP traffic on port 80
+- Check Home Assistant logs for specific error messages
 
 ### Entity Updates
 - Default update interval is 30 seconds
 - Entities update automatically after control commands
+- Partial failures handled gracefully (one bus can fail without affecting the other)
 - Check Home Assistant logs for API communication errors
+
+### Performance Optimization
+- Monitor network latency to device
+- Verify stable WiFi connection
+- Consider static IP assignment for device
+- Check for conflicting integrations polling the same device
 
 ## Support
 
-For issues and feature requests, please use the GitHub repository issue tracker.
+- **Documentation**: [GitHub Repository](https://github.com/thorrak/repelbridge_hacs)
+- **Issues**: [Issue Tracker](https://github.com/thorrak/repelbridge_hacs/issues)
+- **Maintainer**: [@thorrak](https://github.com/thorrak)
 
 ## License
 
-This integration is provided under the MIT License.# repelbridge_hacs
+This integration is provided under the MIT License.
