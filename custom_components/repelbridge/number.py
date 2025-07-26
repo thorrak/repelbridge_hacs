@@ -87,10 +87,10 @@ class RepelBridgeAutoShutoffNumber(RepelBridgeNumberBase):
         """Initialize the auto shutoff number entity."""
         super().__init__(coordinator, api, bus_id, entry_id)
         self._attr_unique_id = f"{entry_id}_bus_{bus_id}_auto_shutoff"
-        entry_short = entry_id.split('-')[0]
-        self._attr_name = f"RepelBridge {entry_short} Bus {bus_id} Auto Shutoff"
+        self._attr_has_entity_name = True
+        self._attr_name = f"Auto Shutoff"
         self._attr_native_min_value = 0
-        self._attr_native_max_value = 960  # 16 hours in minutes
+        self._attr_native_max_value = 360  # 6 hours in minutes
         self._attr_native_step = 1  # 1 minute steps
         self._attr_native_unit_of_measurement = UnitOfTime.MINUTES
         self._attr_mode = NumberMode.BOX
@@ -137,10 +137,10 @@ class RepelBridgeCartridgeWarnAtNumber(RepelBridgeNumberBase):
         """Initialize the cartridge warning number entity."""
         super().__init__(coordinator, api, bus_id, entry_id)
         self._attr_unique_id = f"{entry_id}_bus_{bus_id}_cartridge_warn_at"
-        entry_short = entry_id.split('-')[0]
-        self._attr_name = f"RepelBridge {entry_short} Bus {bus_id} Cartridge Warning"
+        self._attr_has_entity_name = True
+        self._attr_name = f"Cartridge Warning"
         self._attr_native_min_value = 1
-        self._attr_native_max_value = 1000  # 1000 hours max
+        self._attr_native_max_value = 300  # 300 hours max
         self._attr_native_step = 1
         self._attr_native_unit_of_measurement = UnitOfTime.HOURS
         self._attr_mode = NumberMode.BOX
@@ -152,7 +152,7 @@ class RepelBridgeCartridgeWarnAtNumber(RepelBridgeNumberBase):
             return None
         
         warn_at_data = self.coordinator.data["buses"][self.bus_id]["warn_at"]
-        return warn_at_data.get("warn_at_hours", 97)
+        return warn_at_data.get("warn_at_hours", 150)  # Default to 150 hours if not set
 
     async def async_set_native_value(self, value: float) -> None:
         """Set the cartridge warning threshold."""

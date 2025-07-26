@@ -51,8 +51,8 @@ class RepelBridgeCartridgeLowSensor(CoordinatorEntity, BinarySensorEntity):
         super().__init__(coordinator)
         self.bus_id = bus_id
         self._attr_unique_id = f"{entry_id}_bus_{bus_id}_cartridge_low"
-        entry_short = entry_id.split('-')[0]
-        self._attr_name = f"RepelBridge {entry_short} Bus {bus_id} Cartridge Low"
+        self._attr_has_entity_name = True
+        self._attr_name = f"Cartridge Low"
         self._attr_device_class = BinarySensorDeviceClass.PROBLEM
 
     @property
