@@ -78,7 +78,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             else:
                 # Check if already configured
                 await self.async_set_unique_id(user_input[CONF_HOST])
-                self._abort_if_unique_id_configured()
+                self._abort_if_unique_id_configured(updates={CONF_HOST: user_input[CONF_HOST]})
                 
                 return self.async_create_entry(title=info["title"], data=user_input)
 
@@ -93,7 +93,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         
         # Check if already configured
         await self.async_set_unique_id(host)
-        self._abort_if_unique_id_configured()
+        self._abort_if_unique_id_configured(updates={CONF_HOST: host})
         
         # Try to validate the discovered device
         try:
