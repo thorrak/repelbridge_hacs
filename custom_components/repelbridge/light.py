@@ -33,7 +33,7 @@ async def async_setup_entry(
     # Create light entities for both buses
     entities = []
     for bus_id in [0, 1]:
-        entities.append(RepelBridgeLight(coordinator, api, bus_id))
+        entities.append(RepelBridgeLight(coordinator, api, bus_id, config_entry.entry_id))
     
     async_add_entities(entities)
 
@@ -46,12 +46,13 @@ class RepelBridgeLight(CoordinatorEntity, LightEntity):
         coordinator: RepelBridgeDataUpdateCoordinator,
         api: RepelBridgeAPI,
         bus_id: int,
+        entry_id: str,
     ) -> None:
         """Initialize the light."""
         super().__init__(coordinator)
         self.api = api
         self.bus_id = bus_id
-        self._attr_unique_id = f"repelbridge_bus_{bus_id}_light"
+        self._attr_unique_id = f"{entry_id}_bus_{bus_id}_light"
         self._attr_name = f"Liv Repeller Bus {bus_id}"
         self._attr_color_mode = ColorMode.RGB
         self._attr_supported_color_modes = {ColorMode.RGB}
@@ -61,9 +62,9 @@ class RepelBridgeLight(CoordinatorEntity, LightEntity):
         """Return device information."""
         return {
             "identifiers": {(DOMAIN, f"bus_{self.bus_id}")},
-            "name": f"Liv Repeller Bus {self.bus_id}",
+            "name": f"Bus {self.bus_id}",
             "manufacturer": "Liv",
-            "model": "Repeller Device",
+            "model": "RepelBridge Controller",
             "sw_version": "1.0.0",
         }
 
@@ -91,9 +92,10 @@ class RepelBridgeLight(CoordinatorEntity, LightEntity):
             return None
         
         bus_data = self.coordinator.data["buses"][self.bus_id]["status"]
-        # Convert from 0-100 (repeller scale) to 0-255 (HA scale)
+        # Device reports brightness in 0-254 range, HA expects 0-255
         repeller_brightness = bus_data.get("brightness", 0)
-        return int((repeller_brightness * 255) / 100)
+        # Scale from 0-254 to 0-255 (essentially just clamp to 255 max)
+        return min(repeller_brightness, 255)
 
     @property
     def rgb_color(self) -> tuple[int, int, int] | None:
@@ -132,9 +134,9 @@ class RepelBridgeLight(CoordinatorEntity, LightEntity):
         """Instruct the light to turn on."""
         # Handle brightness
         if ATTR_BRIGHTNESS in kwargs:
-            # Convert from HA scale (0-255) to repeller scale (0-100)
+            # Convert from HA scale (0-255) to device scale (0-254)
             ha_brightness = kwargs[ATTR_BRIGHTNESS]
-            repeller_brightness = int((ha_brightness * 100) / 255)
+            repeller_brightness = min(ha_brightness, 254)
             await self.api.set_brightness(self.bus_id, repeller_brightness)
         
         # Handle RGB color

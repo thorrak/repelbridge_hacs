@@ -33,16 +33,12 @@ async def async_setup_entry(
     entities = []
     for bus_id in [0, 1]:
         entities.extend([
-            RepelBridgeRuntimeSensor(coordinator, bus_id),
-            RepelBridgeCartridgeLifeSensor(coordinator, bus_id),
-            RepelBridgeRepellerCountSensor(coordinator, bus_id),
+            RepelBridgeRuntimeSensor(coordinator, bus_id, config_entry.entry_id),
+            RepelBridgeCartridgeLifeSensor(coordinator, bus_id, config_entry.entry_id),
+            RepelBridgeRepellerCountSensor(coordinator, bus_id, config_entry.entry_id),
         ])
     
-    # Add system sensors
-    entities.extend([
-        RepelBridgeWifiStatusSensor(coordinator),
-        RepelBridgeUptimeSensor(coordinator),
-    ])
+    # No system sensors - only bus-specific sensors
     
     async_add_entities(entities)
 
@@ -53,54 +49,41 @@ class RepelBridgeSensorBase(CoordinatorEntity, SensorEntity):
     def __init__(
         self,
         coordinator: RepelBridgeDataUpdateCoordinator,
-        bus_id: int | None = None,
+        bus_id: int,
+        entry_id: str,
     ) -> None:
         """Initialize the sensor."""
         super().__init__(coordinator)
         self.bus_id = bus_id
+        self.entry_id = entry_id
 
     @property
     def device_info(self) -> dict[str, Any]:
         """Return device information."""
-        if self.bus_id is not None:
-            return {
-                "identifiers": {(DOMAIN, f"bus_{self.bus_id}")},
-                "name": f"Liv Repeller Bus {self.bus_id}",
-                "manufacturer": "Liv",
-                "model": "Repeller Device",
-                "sw_version": "1.0.0",
-            }
-        else:
-            return {
-                "identifiers": {(DOMAIN, "system")},
-                "name": "Liv Repeller System",
-                "manufacturer": "Liv",
-                "model": "Repeller Controller",
-                "sw_version": "1.0.0",
-            }
+        return {
+            "identifiers": {(DOMAIN, f"bus_{self.bus_id}")},
+            "name": f"Bus {self.bus_id}",
+            "manufacturer": "Liv",
+            "model": "RepelBridge Controller",
+            "sw_version": "1.0.0",
+        }
 
     @property
     def available(self) -> bool:
         """Return True if entity is available."""
-        if self.bus_id is not None:
-            return (
-                self.coordinator.last_update_success
-                and self.bus_id in self.coordinator.data.get("buses", {})
-            )
-        else:
-            return (
-                self.coordinator.last_update_success
-                and "system" in self.coordinator.data
-            )
+        return (
+            self.coordinator.last_update_success
+            and self.bus_id in self.coordinator.data.get("buses", {})
+        )
 
 
 class RepelBridgeRuntimeSensor(RepelBridgeSensorBase):
     """Sensor for cartridge runtime hours."""
 
-    def __init__(self, coordinator: RepelBridgeDataUpdateCoordinator, bus_id: int) -> None:
+    def __init__(self, coordinator: RepelBridgeDataUpdateCoordinator, bus_id: int, entry_id: str) -> None:
         """Initialize the sensor."""
-        super().__init__(coordinator, bus_id)
-        self._attr_unique_id = f"repelbridge_bus_{bus_id}_runtime_hours"
+        super().__init__(coordinator, bus_id, entry_id)
+        self._attr_unique_id = f"{entry_id}_bus_{bus_id}_runtime_hours"
         self._attr_name = f"Liv Repeller Bus {bus_id} Runtime Hours"
         self._attr_device_class = SensorDeviceClass.DURATION
         self._attr_state_class = SensorStateClass.TOTAL_INCREASING
@@ -131,10 +114,10 @@ class RepelBridgeRuntimeSensor(RepelBridgeSensorBase):
 class RepelBridgeCartridgeLifeSensor(RepelBridgeSensorBase):
     """Sensor for cartridge life percentage."""
 
-    def __init__(self, coordinator: RepelBridgeDataUpdateCoordinator, bus_id: int) -> None:
+    def __init__(self, coordinator: RepelBridgeDataUpdateCoordinator, bus_id: int, entry_id: str) -> None:
         """Initialize the sensor."""
-        super().__init__(coordinator, bus_id)
-        self._attr_unique_id = f"repelbridge_bus_{bus_id}_cartridge_life"
+        super().__init__(coordinator, bus_id, entry_id)
+        self._attr_unique_id = f"{entry_id}_bus_{bus_id}_cartridge_life"
         self._attr_name = f"Liv Repeller Bus {bus_id} Cartridge Life"
         self._attr_state_class = SensorStateClass.MEASUREMENT
         self._attr_native_unit_of_measurement = PERCENTAGE
@@ -167,10 +150,10 @@ class RepelBridgeCartridgeLifeSensor(RepelBridgeSensorBase):
 class RepelBridgeRepellerCountSensor(RepelBridgeSensorBase):
     """Sensor for number of connected repellers."""
 
-    def __init__(self, coordinator: RepelBridgeDataUpdateCoordinator, bus_id: int) -> None:
+    def __init__(self, coordinator: RepelBridgeDataUpdateCoordinator, bus_id: int, entry_id: str) -> None:
         """Initialize the sensor."""
-        super().__init__(coordinator, bus_id)
-        self._attr_unique_id = f"repelbridge_bus_{bus_id}_repeller_count"
+        super().__init__(coordinator, bus_id, entry_id)
+        self._attr_unique_id = f"{entry_id}_bus_{bus_id}_repeller_count"
         self._attr_name = f"Liv Repeller Bus {bus_id} Device Count"
         self._attr_state_class = SensorStateClass.MEASUREMENT
 
@@ -196,68 +179,3 @@ class RepelBridgeRepellerCountSensor(RepelBridgeSensorBase):
         }
 
 
-class RepelBridgeWifiStatusSensor(RepelBridgeSensorBase):
-    """Sensor for WiFi connection status."""
-
-    def __init__(self, coordinator: RepelBridgeDataUpdateCoordinator) -> None:
-        """Initialize the sensor."""
-        super().__init__(coordinator)
-        self._attr_unique_id = "repelbridge_wifi_status"
-        self._attr_name = "Liv Repeller WiFi Status"
-
-    @property
-    def native_value(self) -> str | None:
-        """Return the state of the sensor."""
-        if not self.available:
-            return "unknown"
-        
-        system_data = self.coordinator.data["system"]
-        return "connected" if system_data.get("wifi_connected", False) else "disconnected"
-
-    @property
-    def extra_state_attributes(self) -> dict[str, Any]:
-        """Return extra state attributes."""
-        if not self.available:
-            return {}
-        
-        system_data = self.coordinator.data["system"]
-        return {
-            "ssid": system_data.get("wifi_ssid", ""),
-            "ip_address": system_data.get("wifi_ip", ""),
-            "free_heap": system_data.get("free_heap", 0),
-        }
-
-
-class RepelBridgeUptimeSensor(RepelBridgeSensorBase):
-    """Sensor for system uptime."""
-
-    def __init__(self, coordinator: RepelBridgeDataUpdateCoordinator) -> None:
-        """Initialize the sensor."""
-        super().__init__(coordinator)
-        self._attr_unique_id = "repelbridge_uptime"
-        self._attr_name = "Liv Repeller Uptime"
-        self._attr_device_class = SensorDeviceClass.DURATION
-        self._attr_state_class = SensorStateClass.TOTAL_INCREASING
-        self._attr_native_unit_of_measurement = UnitOfTime.SECONDS
-
-    @property
-    def native_value(self) -> int | None:
-        """Return the state of the sensor."""
-        if not self.available:
-            return None
-        
-        system_data = self.coordinator.data["system"]
-        uptime_ms = system_data.get("uptime_ms", 0)
-        return int(uptime_ms / 1000)  # Convert to seconds
-
-    @property
-    def extra_state_attributes(self) -> dict[str, Any]:
-        """Return extra state attributes."""
-        if not self.available:
-            return {}
-        
-        system_data = self.coordinator.data["system"]
-        return {
-            "uptime_ms": system_data.get("uptime_ms", 0),
-            "device_name": system_data.get("device_name", ""),
-        }

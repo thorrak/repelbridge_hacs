@@ -123,16 +123,13 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 data={CONF_HOST: host, CONF_NAME: name},
             )
 
-        # Ensure we have a name to display
+        # Direct confirmation without relying on strings.json
         name = self.context.get("discovered_name", "RepelBridge")
-        placeholders = {"name": name}
-
+        
         return self.async_show_form(
             step_id="zeroconf_confirm",
-            description_placeholders=placeholders,
             data_schema=vol.Schema({}),
-            last_step=True,
-            errors={},
+            description=f"Do you want to add the RepelBridge device '{name}' to Home Assistant? This will allow you to control Liv Repeller devices and monitor cartridge life.",
         )
 
 

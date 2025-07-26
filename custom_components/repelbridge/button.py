@@ -28,7 +28,7 @@ async def async_setup_entry(
     # Create button entities for both buses
     entities = []
     for bus_id in [0, 1]:
-        entities.append(RepelBridgeResetCartridgeButton(coordinator, api, bus_id))
+        entities.append(RepelBridgeResetCartridgeButton(coordinator, api, bus_id, config_entry.entry_id))
     
     async_add_entities(entities)
 
@@ -41,12 +41,13 @@ class RepelBridgeResetCartridgeButton(CoordinatorEntity, ButtonEntity):
         coordinator: RepelBridgeDataUpdateCoordinator,
         api: RepelBridgeAPI,
         bus_id: int,
+        entry_id: str,
     ) -> None:
         """Initialize the button."""
         super().__init__(coordinator)
         self.api = api
         self.bus_id = bus_id
-        self._attr_unique_id = f"repelbridge_bus_{bus_id}_reset_cartridge"
+        self._attr_unique_id = f"{entry_id}_bus_{bus_id}_reset_cartridge"
         self._attr_name = f"Liv Repeller Bus {bus_id} Reset Cartridge"
         self._attr_icon = "mdi:restore"
 
@@ -55,9 +56,9 @@ class RepelBridgeResetCartridgeButton(CoordinatorEntity, ButtonEntity):
         """Return device information."""
         return {
             "identifiers": {(DOMAIN, f"bus_{self.bus_id}")},
-            "name": f"Liv Repeller Bus {self.bus_id}",
+            "name": f"Bus {self.bus_id}",
             "manufacturer": "Liv",
-            "model": "Repeller Device",
+            "model": "RepelBridge Controller",
             "sw_version": "1.0.0",
         }
 

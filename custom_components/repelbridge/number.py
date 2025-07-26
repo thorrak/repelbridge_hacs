@@ -30,8 +30,8 @@ async def async_setup_entry(
     entities = []
     for bus_id in [0, 1]:
         entities.extend([
-            RepelBridgeAutoShutoffNumber(coordinator, api, bus_id),
-            RepelBridgeCartridgeWarnAtNumber(coordinator, api, bus_id),
+            RepelBridgeAutoShutoffNumber(coordinator, api, bus_id, config_entry.entry_id),
+            RepelBridgeCartridgeWarnAtNumber(coordinator, api, bus_id, config_entry.entry_id),
         ])
     
     async_add_entities(entities)
@@ -45,20 +45,22 @@ class RepelBridgeNumberBase(CoordinatorEntity, NumberEntity):
         coordinator: RepelBridgeDataUpdateCoordinator,
         api: RepelBridgeAPI,
         bus_id: int,
+        entry_id: str,
     ) -> None:
         """Initialize the number entity."""
         super().__init__(coordinator)
         self.api = api
         self.bus_id = bus_id
+        self.entry_id = entry_id
 
     @property
     def device_info(self) -> dict[str, Any]:
         """Return device information."""
         return {
             "identifiers": {(DOMAIN, f"bus_{self.bus_id}")},
-            "name": f"Liv Repeller Bus {self.bus_id}",
+            "name": f"Bus {self.bus_id}",
             "manufacturer": "Liv",
-            "model": "Repeller Device",
+            "model": "RepelBridge Controller",
             "sw_version": "1.0.0",
         }
 
@@ -79,10 +81,11 @@ class RepelBridgeAutoShutoffNumber(RepelBridgeNumberBase):
         coordinator: RepelBridgeDataUpdateCoordinator,
         api: RepelBridgeAPI,
         bus_id: int,
+        entry_id: str,
     ) -> None:
         """Initialize the auto shutoff number entity."""
-        super().__init__(coordinator, api, bus_id)
-        self._attr_unique_id = f"repelbridge_bus_{bus_id}_auto_shutoff"
+        super().__init__(coordinator, api, bus_id, entry_id)
+        self._attr_unique_id = f"{entry_id}_bus_{bus_id}_auto_shutoff"
         self._attr_name = f"Liv Repeller Bus {bus_id} Auto Shutoff"
         self._attr_native_min_value = 0
         self._attr_native_max_value = 960  # 16 hours in minutes
@@ -127,10 +130,11 @@ class RepelBridgeCartridgeWarnAtNumber(RepelBridgeNumberBase):
         coordinator: RepelBridgeDataUpdateCoordinator,
         api: RepelBridgeAPI,
         bus_id: int,
+        entry_id: str,
     ) -> None:
         """Initialize the cartridge warning number entity."""
-        super().__init__(coordinator, api, bus_id)
-        self._attr_unique_id = f"repelbridge_bus_{bus_id}_cartridge_warn_at"
+        super().__init__(coordinator, api, bus_id, entry_id)
+        self._attr_unique_id = f"{entry_id}_bus_{bus_id}_cartridge_warn_at"
         self._attr_name = f"Liv Repeller Bus {bus_id} Cartridge Warning"
         self._attr_native_min_value = 1
         self._attr_native_max_value = 1000  # 1000 hours max

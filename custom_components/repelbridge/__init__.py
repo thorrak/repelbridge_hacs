@@ -145,11 +145,11 @@ class RepelBridgeDataUpdateCoordinator(DataUpdateCoordinator):
     async def _async_update_data(self):
         """Update data via library."""
         try:
-            # Get system status first
-            system_data = await self.api.get_system_status()
+            # Test system connectivity (not storing system data as no sensors use it)
+            await self.api.get_system_status()
             
             # Get data for both buses
-            data = {"system": system_data, "buses": {}}
+            data = {"buses": {}}
             
             for bus_id in [0, 1]:
                 try:

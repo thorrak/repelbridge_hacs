@@ -33,7 +33,7 @@ async def async_setup_entry(
     # Create binary sensor entities for both buses
     entities = []
     for bus_id in [0, 1]:
-        entities.append(RepelBridgeCartridgeLowSensor(coordinator, bus_id))
+        entities.append(RepelBridgeCartridgeLowSensor(coordinator, bus_id, config_entry.entry_id))
     
     async_add_entities(entities)
 
@@ -45,11 +45,12 @@ class RepelBridgeCartridgeLowSensor(CoordinatorEntity, BinarySensorEntity):
         self,
         coordinator: RepelBridgeDataUpdateCoordinator,
         bus_id: int,
+        entry_id: str,
     ) -> None:
         """Initialize the binary sensor."""
         super().__init__(coordinator)
         self.bus_id = bus_id
-        self._attr_unique_id = f"repelbridge_bus_{bus_id}_cartridge_low"
+        self._attr_unique_id = f"{entry_id}_bus_{bus_id}_cartridge_low"
         self._attr_name = f"Liv Repeller Bus {bus_id} Cartridge Low"
         self._attr_device_class = BinarySensorDeviceClass.PROBLEM
 
@@ -58,9 +59,9 @@ class RepelBridgeCartridgeLowSensor(CoordinatorEntity, BinarySensorEntity):
         """Return device information."""
         return {
             "identifiers": {(DOMAIN, f"bus_{self.bus_id}")},
-            "name": f"Liv Repeller Bus {self.bus_id}",
+            "name": f"Bus {self.bus_id}",
             "manufacturer": "Liv",
-            "model": "Repeller Device",
+            "model": "RepelBridge Controller",
             "sw_version": "1.0.0",
         }
 
