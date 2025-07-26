@@ -94,9 +94,7 @@ class RepelBridgeLight(CoordinatorEntity, LightEntity):
             return None
         
         bus_data = self.coordinator.data["buses"][self.bus_id]["status"]
-        # Device reports brightness in 0-254 range, HA expects 0-255
-        repeller_brightness = bus_data.get("brightness", 0)
-        # Scale from 0-254 to 0-255 (essentially just clamp to 255 max)
+        repeller_brightness = bus_data.get("brightness", 1)
         return min(repeller_brightness, 255)
 
     @property
@@ -138,7 +136,7 @@ class RepelBridgeLight(CoordinatorEntity, LightEntity):
         if ATTR_BRIGHTNESS in kwargs:
             # Convert from HA scale (0-255) to device scale (0-254)
             ha_brightness = kwargs[ATTR_BRIGHTNESS]
-            repeller_brightness = min(ha_brightness, 254)
+            repeller_brightness = min(ha_brightness, 255)
             await self.api.set_brightness(self.bus_id, repeller_brightness)
         
         # Handle RGB color
