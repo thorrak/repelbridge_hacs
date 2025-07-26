@@ -99,7 +99,16 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     async def async_step_zeroconf(self, discovery_info) -> FlowResult:
         """Handle zeroconf discovery."""
         host = discovery_info.host
-        name = discovery_info.name.replace("._repelbridge._tcp.local.", "")
+        # Extract device name from discovery info
+        name = discovery_info.name
+        if name.endswith("._repelbridge._tcp.local."):
+            name = name.replace("._repelbridge._tcp.local.", "")
+        elif name.endswith(".local."):
+            name = name.replace(".local.", "")
+        
+        # Fallback to a meaningful name if extraction fails
+        if not name or name == discovery_info.name:
+            name = f"RepelBridge at {host}"
         
         # Check if already configured
         await self.async_set_unique_id(host)
@@ -135,8 +144,12 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 data={CONF_HOST: host, CONF_NAME: name},
             )
 
-        # Use strings.json for confirmation
+        # Get name from context for confirmation display
         name = self.context.get("discovered_name", "RepelBridge")
+        
+        # Ensure title_placeholders are maintained
+        if "title_placeholders" not in self.context:
+            self.context["title_placeholders"] = {"name": name}
         
         return self.async_show_form(
             step_id="zeroconf_confirm",
